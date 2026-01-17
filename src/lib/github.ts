@@ -37,13 +37,17 @@ function slugify(text: string): string {
 }
 
 /**
- * Format date to "YYYY-MM-DD" format
+ * Format date to "Month DD, YYYY" format
  */
 function formatDate(date: Date): string {
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  const month = months[date.getMonth()];
+  const day = date.getDate();
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  return `${month} ${day}, ${year}`;
 }
 
 /**

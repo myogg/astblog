@@ -35,6 +35,11 @@ marked.setOptions({
 
 // Render markdown to HTML
 const htmlContent = marked(post.content);
+
+// Split date to bold the year
+const dateParts = post.dateFormatted.split(', ');
+const monthDay = dateParts[0]; // "January 15"
+const year = dateParts[1]; // "2024"
 ---
 
 <Layout title={post.title}>
@@ -59,9 +64,9 @@ const htmlContent = marked(post.content);
         {post.title}
       </h1>
 
-      <div class="w-full max-w-2xl mx-auto mb-6">
+      <div class="w-full max-w-3xl mx-auto mb-6">
         <div class="flex flex-wrap items-center gap-3 text-sm text-neutral-600 dark:text-neutral-400">
-          <span>{post.dateFormatted}</span>
+          <span>{monthDay}, <strong class="font-semibold text-neutral-900 dark:text-neutral-100">{year}</strong></span>
           {post.labels.length > 0 && (
             <>
               <span class="text-neutral-400 dark:text-neutral-600">|</span>
