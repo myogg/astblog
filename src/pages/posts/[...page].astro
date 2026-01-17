@@ -1,0 +1,75 @@
+---
+import PageHeading from "../../components/page-heading.astro";
+import PostsLoop from "../../components/posts-loop.astro";
+import Layout from "../../layouts/main.astro";
+import { fetchBlogPosts } from "../../lib/github";
+import type { GetStaticPaths, Page } from "astro";
+import type { BlogPost } from "../../lib/github";
+
+export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
+  const posts = await fetchBlogPosts();
+
+  // Sort posts by created_at (newest first)
+  const sortedPosts = [...posts].sort(
+    (a, b) => b.created_at.getTime() - a.created_at.getTime()
+  );
+
+  return paginate(sortedPosts, { pageSize: 15 });
+};
+
+interface Props {
+  page: Page<BlogPost>;
+}
+
+const { page } = Astro.props;
+---
+
+<Layout title="博客">
+  <section class="relative z-20 max-w-2xl mx-auto my-12 px-7 lg:px-0">
+    <PageHeading
+      title="博客"
+      description="Dive into my musings on life and tech in my latest posts;"
+    />
+
+    <div class="z-50 flex flex-col items-stretch w-full gap-5 my-8">
+      <PostsLoop posts={page.data} />
+    </div>
+
+    <!-- 分页导航 -->
+    {(page.url.prev || page.url.next) && (
+      <nav class="flex justify-center items-center gap-4 mt-12">
+        {page.url.prev ? (
+          <a
+            href={page.url.prev}
+            class="px-5 py-2.5 text-sm font-medium rounded-lg border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+          >
+            ← 上一页
+          </a>
+        ) : (
+          <div class="px-5 py-2.5 text-sm font-medium text-neutral-400 dark:text-neutral-600">
+            ← 上一页
+          </div>
+        )}
+
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-neutral-600 dark:text-neutral-400">
+            第 {page.currentPage} / {page.lastPage} 页
+          </span>
+        </div>
+
+        {page.url.next ? (
+          <a
+            href={page.url.next}
+            class="px-5 py-2.5 text-sm font-medium rounded-lg border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+          >
+            下一页 →
+          </a>
+        ) : (
+          <div class="px-5 py-2.5 text-sm font-medium text-neutral-400 dark:text-neutral-600">
+            下一页 →
+          </div>
+        )}
+      </nav>
+    )}
+  </section>
+</Layout>

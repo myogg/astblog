@@ -1,22 +1,4 @@
 ---
-import PageHeading from "../components/page-heading.astro";
-import PostsLoop from "../components/posts-loop.astro";
-import Layout from "../layouts/main.astro";
-import { fetchBlogPosts } from "../lib/github";
-
-// Fetch all blog posts from GitHub Issues
-const posts = await fetchBlogPosts();
+// Redirect to paginated posts page
+return Astro.redirect("/posts/1");
 ---
-
-<Layout title="博客">
-  <section class="relative z-20 max-w-2xl mx-auto my-12 px-7 lg:px-0">
-    <PageHeading
-      title="博客"
-      description="Dive into my musings on life and tech in my latest posts;"
-    />
-
-    <div class="z-50 flex flex-col items-stretch w-full gap-5 my-8">
-      <PostsLoop posts={posts} />
-    </div>
-  </section>
-</Layout>
