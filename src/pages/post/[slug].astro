@@ -1,0 +1,79 @@
+---
+import { fetchBlogPosts } from "../../lib/github";
+import Layout from "../../layouts/main.astro";
+import { marked } from "marked";
+
+export async function getStaticPaths() {
+  const posts = await fetchBlogPosts();
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+
+// Configure marked for better rendering
+marked.setOptions({
+  gfm: true, // GitHub Flavored Markdown
+  breaks: true, // Convert \n to <br>
+});
+
+// Render markdown to HTML
+const htmlContent = marked(post.content);
+---
+
+<Layout title={post.title}>
+  <main
+    class="relative z-30 max-w-4xl pb-1 mx-auto mt-10 bg-white dark:bg-neutral-950 md:rounded-t-md text-neutral-900"
+  >
+    <div
+      class="relative flex flex-col px-5 pt-6 border-t border-b-0 md:border-r md:border-l md:pt-20 lg:px-0 justify-stretch md:rounded-t-2xl border-neutral-200 dark:border-neutral-800"
+    >
+      <div
+        class="absolute top-0 left-0 hidden w-px h-full mt-1 -translate-x-px md:block bg-gradient-to-b from-transparent to-white dark:to-neutral-950"
+      >
+      </div>
+      <div
+        class="absolute top-0 right-0 hidden w-px h-full mt-1 translate-x-px md:block bg-gradient-to-b from-transparent to-white dark:to-neutral-950"
+      >
+      </div>
+
+      <h1
+        class="w-full max-w-2xl mx-auto text-3xl font-bold leading-tight tracking-tighter text-left md:mb-6 md:text-4xl dark:text-neutral-100 lg:text-5xl md:leading-none"
+      >
+        {post.title}
+      </h1>
+
+      <div class="w-full max-w-2xl mx-auto mb-6">
+        <div class="flex items-center gap-4 text-sm text-neutral-600 dark:text-neutral-400">
+          <span>Posted on {post.dateFormatted}</span>
+          {post.labels.length > 0 && (
+            <div class="flex gap-2">
+              {post.labels.map((label) => (
+                <span class="px-2 py-1 text-xs rounded-md bg-neutral-100 dark:bg-neutral-800">
+                  {label}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        <div class="mt-4">
+          <a
+            href={post.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            View on GitHub →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <article
+      class="w-full max-w-2xl mx-auto mb-20 prose-sm prose px-7 lg:px-0 lg:prose-lg dark:prose-invert"
+      set:html={htmlContent}
+    />
+  </main>
+</Layout>

@@ -1,0 +1,35 @@
+name: Deploy Astro Site
+on:
+  push:
+    branches: [ main ] # 监听 main 分支的推送
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20 # 使用 Node.js 20
+          cache: pnpm # 该项目使用 pnpm，开启缓存加速
+
+      - name: Install Dependencies
+        run: pnpm install # 安装依赖
+
+      - name: Build
+        run: pnpm run build # 执行构建命令
+
+      # 以下部分是 GitHub Pages 必需的部署步骤
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist # 指定 Astro 构建输出的文件夹
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
