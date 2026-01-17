@@ -1,0 +1,21 @@
+name: Auto Deploy on Issue Change
+
+on:
+  issues:
+    types: [opened, edited, deleted, closed, reopened]
+
+jobs:
+  trigger-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Trigger rebuild
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit --allow-empty -m "chore: trigger rebuild for issue #${{ github.event.issue.number }}"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
