@@ -1,6 +1,7 @@
 name: Auto Deploy on Issue Change
 
 on:
+  workflow_dispatch:   # 手動觸發
   issues:
     types: [opened, edited, deleted, closed, reopened]
 
