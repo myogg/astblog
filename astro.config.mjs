@@ -5,5 +5,5 @@ import tailwind from "@astrojs/tailwind";
 // https://astro.build/config
 export default defineConfig({
 	integrations: [tailwind()],
-	site: "https://your-site.pages.dev", // Update with your Cloudflare Pages domain
+	site: "https://astblog.pages.dev",
 });
