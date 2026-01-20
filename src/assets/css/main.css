@@ -4,6 +4,13 @@
 
 /* Add Your Custom CSS Here */
 
+/* 手机端正文使用思源字体 */
+@media screen and (max-width: 768px) {
+  body, .prose {
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+}
+
 .prose img {
   border-radius: 30px;
 }
