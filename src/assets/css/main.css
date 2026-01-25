@@ -4,11 +4,9 @@
 
 /* Add Your Custom CSS Here */
 
-/* 手机端正文使用思源字体 */
-@media screen and (max-width: 768px) {
-  body, .prose {
-    font-family: 'Noto Sans SC', sans-serif;
-  }
+/* 全站使用微软雅黑字体 */
+body, .prose {
+  font-family: 'Microsoft YaHei', '微软雅黑', sans-serif;
 }
 
 .prose img {
