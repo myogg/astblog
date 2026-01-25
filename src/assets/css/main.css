@@ -4,9 +4,26 @@
 
 /* Add Your Custom CSS Here */
 
-/* 全站使用微软雅黑字体 */
+/* 全站使用思源黑体字体 */
 body, .prose {
-  font-family: 'Microsoft YaHei', '微软雅黑', sans-serif;
+  font-family: 'Source Han Sans SC', 'Noto Sans SC', '思源黑体', sans-serif;
+}
+
+/* 移动端增加字体间距 */
+@media (max-width: 768px) {
+  body, .prose {
+    letter-spacing: 0.02em;
+    line-height: 1.8;
+  }
+
+  .prose p {
+    letter-spacing: 0.03em;
+    line-height: 1.9;
+  }
+
+  .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+    letter-spacing: 0.02em;
+  }
 }
 
 .prose img {

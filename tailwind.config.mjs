@@ -5,7 +5,7 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				sans: ['Microsoft YaHei', '微软雅黑', 'sans-serif'],
+				sans: ['"Source Han Sans SC"', '"Noto Sans SC"', '"思源黑体"', 'sans-serif'],
 			},
 		},
 	},
