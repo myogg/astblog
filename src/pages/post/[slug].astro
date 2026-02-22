@@ -2,6 +2,7 @@
 import { fetchBlogPosts } from "../../lib/github";
 import Layout from "../../layouts/main.astro";
 import { marked } from "marked";
+import Comments from "../../components/comments.astro";
 
 export async function getStaticPaths() {
   const posts = await fetchBlogPosts();
@@ -122,5 +123,7 @@ const year = dateParts[1]; // "2024"
         </div>
       </nav>
     )}
+
+    <Comments />
   </main>
 </Layout>

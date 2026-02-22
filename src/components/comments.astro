@@ -1,0 +1,27 @@
+---
+// Giscus 评论组件
+---
+
+<div class="w-full max-w-3xl mx-auto px-7 lg:px-0 mb-20">
+  <div class="giscus"></div>
+</div>
+
+<script>
+  const script = document.createElement('script');
+  script.src = 'https://giscus.app/client.js';
+  script.setAttribute('data-repo', 'myogg/astblog');
+  script.setAttribute('data-repo-id', 'R_kgDOQ7PGZA');
+  script.setAttribute('data-category', 'General');
+  script.setAttribute('data-category-id', 'DIC_kwDOQ7PGZM4C2-nh');
+  script.setAttribute('data-mapping', 'pathname');
+  script.setAttribute('data-strict', '0');
+  script.setAttribute('data-reactions-enabled', '1');
+  script.setAttribute('data-emit-metadata', '0');
+  script.setAttribute('data-input-position', 'bottom');
+  script.setAttribute('data-theme', 'preferred_color_scheme');
+  script.setAttribute('data-lang', 'zh-CN');
+  script.crossOrigin = 'anonymous';
+  script.async = true;
+
+  document.querySelector('.giscus')?.appendChild(script);
+</script>
