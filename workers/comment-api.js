@@ -38,7 +38,7 @@ export default {
           });
         }
 
-        await env.DB.prepare(
+        const result = await env.DB.prepare(
           'INSERT INTO comments (page, name, email, content, created_at) VALUES (?, ?, ?, ?, ?)'
         ).bind(
           page,
@@ -48,7 +48,7 @@ export default {
           new Date().toISOString()
         ).run();
 
-        return new Response(JSON.stringify({ success: true }), {
+        return new Response(JSON.stringify({ success: true, id: result.meta.last_row_id }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
       }
