@@ -23,18 +23,28 @@ const { pathname } = Astro.url;
   const list = document.getElementById('comments-list');
 
   async function loadComments() {
-    const res = await fetch(`${API_URL}/comments?page=${pathname}`);
-    const comments = await res.json();
+    try {
+      const res = await fetch(`${API_URL}/comments?page=${pathname}`);
+      const comments = await res.json();
 
-    list.innerHTML = comments.map(c => `
-      <div class="p-4 border rounded-lg dark:border-neutral-700">
-        <div class="flex items-center gap-2 mb-2">
-          <span class="font-medium text-neutral-900 dark:text-neutral-100">${c.name}</span>
-          <span class="text-sm text-neutral-500">${new Date(c.created_at).toLocaleString('zh-CN')}</span>
+      if (comments.length === 0) {
+        list.innerHTML = '<p class="text-neutral-500 dark:text-neutral-400">暂无评论</p>';
+        return;
+      }
+
+      list.innerHTML = comments.map(c => `
+        <div class="p-4 border rounded-lg dark:border-neutral-700">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="font-medium text-neutral-900 dark:text-neutral-100">${c.name || '匿名'}</span>
+            <span class="text-sm text-neutral-500">${new Date(c.created_at).toLocaleString('zh-CN')}</span>
+          </div>
+          <p class="text-neutral-700 dark:text-neutral-300">${c.content}</p>
         </div>
-        <p class="text-neutral-700 dark:text-neutral-300">${c.content}</p>
-      </div>
-    `).join('');
+      `).join('');
+    } catch (err) {
+      console.error('加载评论失败:', err);
+      list.innerHTML = '<p class="text-red-500">加载评论失败</p>';
+    }
   }
 
   form.addEventListener('submit', async (e) => {
@@ -43,14 +53,23 @@ const { pathname } = Astro.url;
     const email = document.getElementById('email').value;
     const content = document.getElementById('content').value;
 
-    await fetch(`${API_URL}/comments`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ page: pathname, name, email, content })
-    });
+    try {
+      const res = await fetch(`${API_URL}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ page: pathname, name, email, content })
+      });
 
-    form.reset();
-    loadComments();
+      if (res.ok) {
+        form.reset();
+        await loadComments();
+      } else {
+        alert('发表评论失败');
+      }
+    } catch (err) {
+      console.error('发表评论失败:', err);
+      alert('发表评论失败');
+    }
   });
 
   loadComments();
