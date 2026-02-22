@@ -19,13 +19,20 @@ const pathname = Astro.url.pathname;
 </div>
 
 <script define:vars={{ API_URL, pathname }}>
+  console.log('评论脚本已加载', { API_URL, pathname });
+
   const form = document.getElementById('comment-form');
   const list = document.getElementById('comments-list');
 
+  console.log('表单元素:', form);
+  console.log('列表元素:', list);
+
   async function loadComments() {
+    console.log('开始加载评论...');
     try {
       const res = await fetch(`${API_URL}/comments?page=${pathname}`);
       const comments = await res.json();
+      console.log('收到评论:', comments);
 
       if (comments.length === 0) {
         list.innerHTML = '<p class="text-neutral-500 dark:text-neutral-400">暂无评论</p>';
@@ -49,9 +56,13 @@ const pathname = Astro.url.pathname;
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    console.log('表单提交事件触发');
+
     const name = document.getElementById('name').value;
     const email = document.getElementById('email').value;
     const content = document.getElementById('content').value;
+
+    console.log('提交数据:', { page: pathname, name, email, content });
 
     try {
       const res = await fetch(`${API_URL}/comments`, {
@@ -59,6 +70,8 @@ const pathname = Astro.url.pathname;
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ page: pathname, name, email, content })
       });
+
+      console.log('POST 响应:', res.status);
 
       if (res.ok) {
         form.reset();
