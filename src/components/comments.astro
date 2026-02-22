@@ -1,27 +1,57 @@
 ---
-// Giscus 评论组件
+const API_URL = 'YOUR_WORKERS_URL'; // 替换为你的 Cloudflare Workers URL
+const { pathname } = Astro.url;
 ---
 
 <div class="w-full max-w-3xl mx-auto px-7 lg:px-0 mb-20 pt-8 border-t border-neutral-200 dark:border-neutral-800">
-  <div class="giscus"></div>
+  <h3 class="text-xl font-semibold mb-6 text-neutral-900 dark:text-neutral-100">评论</h3>
+
+  <form id="comment-form" class="mb-8 space-y-4">
+    <div class="grid grid-cols-2 gap-4">
+      <input type="text" id="name" placeholder="昵称（可选）" class="px-4 py-2 border rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-100" />
+      <input type="email" id="email" placeholder="邮箱（可选）" class="px-4 py-2 border rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-100" />
+    </div>
+    <textarea id="content" placeholder="写下你的评论..." rows="4" required class="w-full px-4 py-2 border rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-100"></textarea>
+    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">发表评论</button>
+  </form>
+
+  <div id="comments-list" class="space-y-4"></div>
 </div>
 
-<script>
-  const script = document.createElement('script');
-  script.src = 'https://giscus.app/client.js';
-  script.setAttribute('data-repo', 'myogg/astblog');
-  script.setAttribute('data-repo-id', 'R_kgDOQ7PGZA');
-  script.setAttribute('data-category', 'General');
-  script.setAttribute('data-category-id', 'DIC_kwDOQ7PGZM4C2-nh');
-  script.setAttribute('data-mapping', 'pathname');
-  script.setAttribute('data-strict', '0');
-  script.setAttribute('data-reactions-enabled', '1');
-  script.setAttribute('data-emit-metadata', '0');
-  script.setAttribute('data-input-position', 'bottom');
-  script.setAttribute('data-theme', 'preferred_color_scheme');
-  script.setAttribute('data-lang', 'zh-CN');
-  script.crossOrigin = 'anonymous';
-  script.async = true;
+<script define:vars={{ API_URL, pathname }}>
+  const form = document.getElementById('comment-form');
+  const list = document.getElementById('comments-list');
 
-  document.querySelector('.giscus')?.appendChild(script);
+  async function loadComments() {
+    const res = await fetch(`${API_URL}/comments?page=${pathname}`);
+    const comments = await res.json();
+
+    list.innerHTML = comments.map(c => `
+      <div class="p-4 border rounded-lg dark:border-neutral-700">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="font-medium text-neutral-900 dark:text-neutral-100">${c.name}</span>
+          <span class="text-sm text-neutral-500">${new Date(c.created_at).toLocaleString('zh-CN')}</span>
+        </div>
+        <p class="text-neutral-700 dark:text-neutral-300">${c.content}</p>
+      </div>
+    `).join('');
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const content = document.getElementById('content').value;
+
+    await fetch(`${API_URL}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ page: pathname, name, email, content })
+    });
+
+    form.reset();
+    loadComments();
+  });
+
+  loadComments();
 </script>
