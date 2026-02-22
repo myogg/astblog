@@ -29,8 +29,13 @@ const pathname = Astro.url.pathname;
 
   async function loadComments() {
     console.log('开始加载评论...');
+    console.log('当前路径:', pathname);
     try {
-      const res = await fetch(`${API_URL}/comments?page=${pathname}`);
+      // 确保路径编码一致
+      const encodedPath = encodeURI(pathname);
+      console.log('编码后路径:', encodedPath);
+
+      const res = await fetch(`${API_URL}/comments?page=${encodedPath}`);
       const comments = await res.json();
       console.log('收到评论:', comments);
 
