@@ -9,20 +9,36 @@ body, .prose {
   font-family: 'Source Han Sans SC', 'Noto Sans SC', '思源黑体', sans-serif;
 }
 
-/* 移动端增加字体间距 */
+/* 文章页增加行距和字距 */
+.prose {
+  letter-spacing: 0.03em;
+  line-height: 2;
+}
+
+.prose p {
+  letter-spacing: 0.04em;
+  line-height: 2.1;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  letter-spacing: 0.03em;
+  line-height: 1.6;
+}
+
+/* 移动端进一步增加字体间距 */
 @media (max-width: 768px) {
-  body, .prose {
-    letter-spacing: 0.02em;
-    line-height: 1.8;
+  .prose {
+    letter-spacing: 0.04em;
+    line-height: 2.2;
   }
 
   .prose p {
-    letter-spacing: 0.03em;
-    line-height: 1.9;
+    letter-spacing: 0.05em;
+    line-height: 2.3;
   }
 
   .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
   }
 }
 
