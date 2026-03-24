@@ -1,0 +1,71 @@
+---
+const projects = [
+  {
+    title: "TimeAPK",
+    description: "A time management application built with modern technologies. Simple and effective time tracking tool for Android devices.",
+    link: "https://github.com/myogg/timeapk",
+    image: "/assets/images/projects/dns.surf.png"
+  },
+  {
+    title: "Coming Soon",
+    description: "More projects will be added here. Stay tuned for updates!",
+    link: "#",
+    image: "/assets/images/projects/html.zone.png"
+  },
+  {
+    title: "Coming Soon",
+    description: "More projects will be added here. Stay tuned for updates!",
+    link: "#",
+    image: "/assets/images/projects/sink.cool.png"
+  }
+];
+---
+
+<section class="max-w-4xl mx-auto px-7 lg:px-0 py-16">
+  <h2
+    class="text-2xl font-bold leading-10 tracking-tight text-neutral-900 dark:text-neutral-100 mb-8"
+  >
+    My Projects
+  </h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {projects.map((project) => (
+      <a
+        href={project.link}
+        class="group block p-6 border border-dashed rounded-2xl border-neutral-300 dark:border-neutral-600 hover:border-neutral-500 dark:hover:border-neutral-400 transition-colors duration-300"
+      >
+        <div class="aspect-video w-full bg-neutral-100 dark:bg-neutral-800 rounded-lg mb-4 overflow-hidden">
+          <img
+            src={project.image}
+            alt={project.title}
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+          />
+        </div>
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
+          {project.title}
+        </h3>
+        <p class="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-3">
+          {project.description}
+        </p>
+        <div class="mt-4 flex items-center text-xs font-medium text-neutral-600 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-100">
+          <svg
+            class="w-4 h-4 mr-1"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+            />
+          </svg>
+          View Project
+        </div>
+      </a>
+    ))}
+  </div>
+</section>
