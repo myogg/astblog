@@ -16,6 +16,8 @@ export interface BlogPost {
 // Initialize Octokit with optional token
 const octokit = new Octokit({
   auth: import.meta.env.GITHUB_TOKEN,
+  baseUrl: 'https://api.github.com',
+  log: console,
 });
 
 const GITHUB_OWNER = import.meta.env.GITHUB_OWNER;

@@ -35,7 +35,7 @@ marked.setOptions({
 });
 
 // Render markdown to HTML
-const htmlContent = marked(post.content);
+const htmlContent = marked.parse(post.content);
 
 // Split date to bold the year
 const dateParts = post.dateFormatted.split(', ');
