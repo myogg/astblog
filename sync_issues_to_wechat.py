@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-"""
-GitHub Issues 同步到微信公众号
-"""
+""" GitHub Issues 同步到微信公众号 """
+
 import os
 import re
 import json
@@ -11,7 +10,6 @@ from pathlib import Path
 from wechatpy import WeChatClient
 import markdown
 import yaml
-
 
 class GitHubIssueSyncer:
     def __init__(self, config):
@@ -99,7 +97,7 @@ class GitHubIssueSyncer:
         }
     
     def _extract_digest(self, content, max_length=120):
-        text = re.sub(r'[#*`\[\]!]', '', content)
+        text = re.sub(r'[#\*\`\[\]!]', '', content)
         text = re.sub(r'\s+', ' ', text).strip()
         return text[:max_length] + '...' if len(text) > max_length else text
     
@@ -141,30 +139,37 @@ class GitHubIssueSyncer:
     
     def publish_to_wechat(self, article_data):
         """发布文章到微信公众号"""
-        # 转换为 HTML
-        html_content = self.markdown_to_html(article_data['content'])
-        
-        # 构建文章数据
-        media_data = {
-            'articles': [{
+        try:
+            # 转换为 HTML
+            html_content = self.markdown_to_html(article_data['content'])
+            
+            # 构建文章数据
+            articles_data = [{
                 'title': article_data['title'],
                 'author': article_data['author'],
                 'digest': article_data['digest'],
                 'content': html_content,
                 'content_source_url': article_data['url'],
-                'thumb_media_id': '',  # 需要先上传封面图获取 media_id
-                'show_cover_pic': 1,
+                'thumb_media_id': '', # 需要先上传封面图获取 media_id
+                'show_cover_pic': 0, # 暂时不显示封面，因为没有 media_id
                 'need_open_comment': 1,
                 'only_fans_can_comment': 0
             }]
-        }
-        
-        # 调用微信 API 发布草稿
-        try:
-            result = self.wechat_client.draft.add(media_data)
-            return result
+            
+            # 使用正确的 wechatpy API 方法
+            result = self.wechat_client.material.add_articles(articles_data)
+            print(f"微信 API 返回结果: {result}")
+            
+            if result and 'media_id' in result:
+                return result
+            else:
+                print(f"API 返回结果格式异常: {result}")
+                return None
+                
         except Exception as e:
-            print(f"发布失败: {e}")
+            print(f"发布过程中的详细错误: {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
             return None
     
     def sync(self):
@@ -184,23 +189,24 @@ class GitHubIssueSyncer:
                 
                 # 发布到微信
                 result = self.publish_to_wechat(article_data)
-                
                 if result:
                     print(f"成功发布: {article_data['title']}")
                     # 更新同步状态
                     self.synced_issues[str(issue['number'])] = {
                         'updated_at': issue['updated_at'],
-                        'synced_at': datetime.now().isoformat()
+                        'synced_at': datetime.now().isoformat(),
+                        'media_id': result.get('media_id', '')
                     }
                 else:
                     print(f"发布失败: {article_data['title']}")
-                    
+            
             except Exception as e:
                 print(f"处理 Issue {issue['number']} 时出错: {e}")
+                import traceback
+                traceback.print_exc()
         
         # 保存同步状态
         self._save_state()
-
 
 def main():
     # 从环境变量或配置文件加载配置
@@ -223,7 +229,6 @@ def main():
     # 执行同步
     syncer = GitHubIssueSyncer(config)
     syncer.sync()
-
 
 if __name__ == '__main__':
     main()
