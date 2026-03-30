@@ -28,7 +28,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        pip install wechatpy python-markdown pyyaml requests cryptography
+        pip install wechatpy markdown pyyaml requests cryptography
     
     - name: Sync Issues to WeChat
       env:
