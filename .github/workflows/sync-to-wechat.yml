@@ -46,4 +46,5 @@ jobs:
         git config --local user.name "GitHub Action"
         git add .sync_state.json
         git diff --quiet && git diff --staged --quiet || git commit -m "chore: update sync state"
+        git pull --rebase --autostash
         git push
