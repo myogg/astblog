@@ -2,23 +2,23 @@
 import type { BlogPost } from "../lib/github";
 
 interface Props {
-  posts: BlogPost[];
-  count?: number;
+	posts: BlogPost[];
+	count?: number;
 }
 
 const { posts, count = 999999999 } = Astro.props;
 
 // Sort posts by created_at (newest first)
 const sortedPosts = [...posts].sort(
-  (a, b) => b.created_at.getTime() - a.created_at.getTime()
+	(a, b) => b.created_at.getTime() - a.created_at.getTime(),
 );
 
 // Limit to count
 const postsLoop = sortedPosts.slice(0, Number(count)).map((post) => ({
-  title: post.title,
-  description: post.description,
-  dateFormatted: post.dateFormatted,
-  link: `/post/${post.slug}`,
+	title: post.title,
+	description: post.description,
+	dateFormatted: post.dateFormatted,
+	link: `/post/${post.slug}`,
 }));
 ---
 

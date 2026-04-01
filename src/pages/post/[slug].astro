@@ -1,44 +1,50 @@
 ---
-import { fetchBlogPosts } from "../../lib/github";
-import Layout from "../../layouts/main.astro";
 import { marked } from "marked";
 import Comments from "../../components/comments.astro";
+import Tag from "../../components/tag.astro";
+import Layout from "../../layouts/main.astro";
+import { fetchBlogPosts } from "../../lib/github";
 
 export async function getStaticPaths() {
-  const posts = await fetchBlogPosts();
-  // Sort posts by created_at (newest first)
-  const sortedPosts = [...posts].sort(
-    (a, b) => b.created_at.getTime() - a.created_at.getTime()
-  );
+	const posts = await fetchBlogPosts();
+	// Sort posts by created_at (newest first)
+	const sortedPosts = [...posts].sort(
+		(a, b) => b.created_at.getTime() - a.created_at.getTime(),
+	);
 
-  return sortedPosts.map((post, index) => {
-    const prevPost = index > 0 ? sortedPosts[index - 1] : null;
-    const nextPost = index < sortedPosts.length - 1 ? sortedPosts[index + 1] : null;
+	return sortedPosts.map((post, index) => {
+		const prevPost = index > 0 ? sortedPosts[index - 1] : null;
+		const nextPost =
+			index < sortedPosts.length - 1 ? sortedPosts[index + 1] : null;
 
-    return {
-      params: { slug: post.slug },
-      props: {
-        post,
-        prevPost: prevPost ? { title: prevPost.title, slug: prevPost.slug } : null,
-        nextPost: nextPost ? { title: nextPost.title, slug: nextPost.slug } : null,
-      },
-    };
-  });
+		return {
+			params: { slug: post.slug },
+			props: {
+				post,
+				prevPost: prevPost
+					? { title: prevPost.title, slug: prevPost.slug }
+					: null,
+				nextPost: nextPost
+					? { title: nextPost.title, slug: nextPost.slug }
+					: null,
+			},
+		};
+	});
 }
 
 const { post, prevPost, nextPost } = Astro.props;
 
 // Configure marked for better rendering
 marked.setOptions({
-  gfm: true, // GitHub Flavored Markdown
-  breaks: true, // Convert \n to <br>
+	gfm: true, // GitHub Flavored Markdown
+	breaks: true, // Convert \n to <br>
 });
 
 // Render markdown to HTML
 const htmlContent = marked.parse(post.content);
 
 // Split date to bold the year
-const dateParts = post.dateFormatted.split(', ');
+const dateParts = post.dateFormatted.split(", ");
 const monthDay = dateParts[0]; // "January 15"
 const year = dateParts[1]; // "2024"
 ---
@@ -73,9 +79,7 @@ const year = dateParts[1]; // "2024"
               <span class="text-neutral-400 dark:text-neutral-600">|</span>
               <div class="flex flex-wrap gap-2">
                 {post.labels.map((label) => (
-                  <span class="px-3 py-1 text-xs font-medium rounded-full bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700/50">
-                    {label}
-                  </span>
+                  <Tag label={label} size="md" />
                 ))}
               </div>
             </>

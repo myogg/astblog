@@ -1,0 +1,116 @@
+---
+import PostsLoop from "../../components/posts-loop.astro";
+import TagComponent from "../../components/tag.astro";
+import Layout from "../../layouts/main.astro";
+import { fetchBlogPosts } from "../../lib/github";
+
+export async function getStaticPaths() {
+	const posts = await fetchBlogPosts();
+	const allLabels = new Set<string>();
+
+	// 收集所有不重复的标签名称
+	for (const post of posts) {
+		for (const label of post.labels) {
+			allLabels.add(label.name);
+		}
+	}
+
+	// 为每个标签生成静态路径
+	return Array.from(allLabels).map((tagName) => ({
+		params: {
+			tag: tagName,
+		},
+		props: {
+			tagName,
+		},
+	}));
+}
+
+interface Props {
+	tagName: string;
+}
+
+const { tagName } = Astro.props;
+const posts = await fetchBlogPosts();
+
+// 过滤包含该标签的文章
+const filteredPosts = posts.filter((post) =>
+	post.labels.some((label) => label.name === tagName),
+);
+
+// 获取该标签的颜色信息（从第一篇文章中获取）
+const labelInfo =
+	filteredPosts.length > 0
+		? filteredPosts[0].labels.find((label) => label.name === tagName)
+		: null;
+
+// 按创建时间排序（最新的在前）
+const sortedPosts = [...filteredPosts].sort(
+	(a, b) => b.created_at.getTime() - a.created_at.getTime(),
+);
+
+// 统计该标签的文章数量
+const postCount = filteredPosts.length;
+---
+
+<Layout title={`标签: ${tagName}`}>
+  <main class="relative z-30 max-w-4xl pb-1 mx-auto mt-10 bg-white dark:bg-neutral-950 md:rounded-t-md text-neutral-900">
+    <div class="relative flex flex-col px-5 pt-6 border-t border-b-0 md:border-r md:border-l md:pt-20 lg:px-0 justify-stretch md:rounded-t-2xl border-neutral-200 dark:border-neutral-800">
+      <div class="absolute top-0 left-0 hidden w-px h-full mt-1 -translate-x-px md:block bg-gradient-to-b from-transparent to-white dark:to-neutral-950"></div>
+      <div class="absolute top-0 right-0 hidden w-px h-full mt-1 translate-x-px md:block bg-gradient-to-b from-transparent to-white dark:to-neutral-950"></div>
+
+      <div class="w-full max-w-3xl mx-auto mb-8">
+        <h1 class="text-3xl font-bold leading-tight tracking-tighter md:text-4xl dark:text-neutral-100 lg:text-5xl md:leading-none mb-4">
+          标签: {tagName}
+        </h1>
+
+        <div class="flex flex-wrap items-center gap-4">
+          {labelInfo && (
+            <TagComponent label={labelInfo} size="lg" showCount={postCount} />
+          )}
+
+          <div class="text-sm text-neutral-600 dark:text-neutral-400">
+            共 {postCount} 篇文章
+          </div>
+        </div>
+
+        {postCount === 0 && (
+          <div class="mt-6 p-4 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-neutral-50 dark:bg-neutral-900">
+            <p class="text-neutral-700 dark:text-neutral-300">
+              没有找到包含该标签的文章。
+            </p>
+            <a
+              href="/"
+              class="inline-block mt-3 text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              返回首页 →
+            </a>
+          </div>
+        )}
+      </div>
+    </div>
+
+    {postCount > 0 && (
+      <div class="w-full max-w-3xl mx-auto px-5 lg:px-0 mt-8">
+        <div class="mb-6">
+          <h2 class="text-xl font-semibold text-neutral-800 dark:text-neutral-200 mb-4">
+            相关文章 ({postCount})
+          </h2>
+          <PostsLoop posts={sortedPosts} />
+        </div>
+
+        <div class="mt-12 pt-6 border-t border-neutral-200 dark:border-neutral-800">
+          <a
+            href="/"
+            class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            返回首页
+          </a>
+        </div>
+      </div>
+    )}
+  </main>
+</Layout>

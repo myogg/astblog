@@ -1,9 +1,5 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(tree:*)",
-      "Bash(git push:*)",
-      "Bash(pnpm run:*)"
-    ]
-  }
+	"permissions": {
+		"allow": ["Bash(tree:*)", "Bash(git push:*)", "Bash(pnpm run:*)"]
+	}
 }

@@ -1,24 +1,24 @@
 ---
+import type { GetStaticPaths, Page } from "astro";
 import PageHeading from "../../components/page-heading.astro";
 import PostsLoop from "../../components/posts-loop.astro";
 import Layout from "../../layouts/main.astro";
 import { fetchBlogPosts } from "../../lib/github";
-import type { GetStaticPaths, Page } from "astro";
 import type { BlogPost } from "../../lib/github";
 
 export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
-  const posts = await fetchBlogPosts();
+	const posts = await fetchBlogPosts();
 
-  // Sort posts by created_at (newest first)
-  const sortedPosts = [...posts].sort(
-    (a, b) => b.created_at.getTime() - a.created_at.getTime()
-  );
+	// Sort posts by created_at (newest first)
+	const sortedPosts = [...posts].sort(
+		(a, b) => b.created_at.getTime() - a.created_at.getTime(),
+	);
 
-  return paginate(sortedPosts, { pageSize: 15 });
+	return paginate(sortedPosts, { pageSize: 15 });
 };
 
 interface Props {
-  page: Page<BlogPost>;
+	page: Page<BlogPost>;
 }
 
 const { page } = Astro.props;

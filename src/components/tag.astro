@@ -1,0 +1,43 @@
+---
+import { getContrastColor, normalizeHexColor } from "../lib/color";
+import type { Label } from "../lib/github";
+
+interface Props {
+	label: Label;
+	size?: "sm" | "md" | "lg";
+	showCount?: number;
+	showBorder?: boolean;
+}
+
+const { label, size = "md", showCount, showBorder = true } = Astro.props;
+
+// 规范化颜色格式
+const normalizedColor = normalizeHexColor(label.color);
+// 根据背景色选择对比文字颜色
+const textColor = getContrastColor(normalizedColor);
+
+// 尺寸样式映射
+const sizeClasses = {
+	sm: "px-2 py-0.5 text-xs",
+	md: "px-3 py-1 text-xs",
+	lg: "px-4 py-1.5 text-sm",
+};
+
+// 边框样式
+const borderStyle = showBorder
+	? `border-color: #${normalizedColor}40`
+	: "border-color: transparent";
+---
+
+<a
+  href={`/tags/${encodeURIComponent(label.name)}`}
+  class={`${sizeClasses[size]} font-medium rounded-full border transition-all duration-200 hover:opacity-90 hover:scale-105 inline-flex items-center`}
+  style={`background-color: #${normalizedColor}; color: ${textColor}; ${borderStyle}`}
+  title={label.description || label.name}
+  aria-label={`查看所有包含标签"${label.name}"的文章`}
+>
+  <span>{label.name}</span>
+  {showCount !== undefined && (
+    <span class="ml-1 opacity-80">({showCount})</span>
+  )}
+</a>

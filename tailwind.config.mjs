@@ -5,7 +5,12 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				sans: ['"Source Han Sans SC"', '"Noto Sans SC"', '"思源黑体"', 'sans-serif'],
+				sans: [
+					'"Source Han Sans SC"',
+					'"Noto Sans SC"',
+					'"思源黑体"',
+					"sans-serif",
+				],
 			},
 		},
 	},
