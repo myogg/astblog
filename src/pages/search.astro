@@ -1,0 +1,148 @@
+---
+import MainLayout from "../layouts/main.astro";
+---
+
+<MainLayout title="Search">
+  <div class="max-w-5xl mx-auto px-6 py-12">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-neutral-900 dark:text-white mb-2">Search</h1>
+      <p class="text-neutral-500 dark:text-neutral-400">Search through all posts by title, description, or tag.</p>
+    </div>
+
+    <div class="relative mb-8">
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="Search posts..."
+        autofocus
+        class="w-full px-4 py-3 pr-10 text-neutral-900 dark:text-white bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-500 placeholder-neutral-400 dark:placeholder-neutral-500"
+      />
+      <svg
+        class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 dark:text-neutral-500"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+      </svg>
+    </div>
+
+    <div id="searchStats" class="text-sm text-neutral-400 dark:text-neutral-500 mb-4 hidden"></div>
+
+    <div id="searchResults" class="space-y-4"></div>
+
+    <div id="emptyState" class="hidden text-center py-16 text-neutral-400 dark:text-neutral-500">
+      <svg class="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+      </svg>
+      <p class="text-lg">No results found</p>
+      <p class="text-sm mt-1">Try different keywords</p>
+    </div>
+  </div>
+</MainLayout>
+
+<script>
+  interface SearchItem {
+    slug: string;
+    title: string;
+    description: string;
+    dateFormatted: string;
+    labels: string[];
+  }
+
+  let allPosts: SearchItem[] = [];
+
+  async function loadSearchIndex() {
+    const res = await fetch("/search.json");
+    allPosts = await res.json();
+    // Run search if there's a query param on load
+    const q = new URLSearchParams(window.location.search).get("q") || "";
+    const input = document.getElementById("searchInput") as HTMLInputElement;
+    if (q) {
+      input.value = q;
+    }
+    search(input.value);
+  }
+
+  function highlight(text: string, query: string): string {
+    if (!query.trim()) return text;
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const re = new RegExp(`(${escaped})`, "gi");
+    return text.replace(re, '<mark class="bg-yellow-200 dark:bg-yellow-700 rounded px-0.5">$1</mark>');
+  }
+
+  function search(query: string) {
+    const statsEl = document.getElementById("searchStats")!;
+    const resultsEl = document.getElementById("searchResults")!;
+    const emptyEl = document.getElementById("emptyState")!;
+
+    const q = query.trim().toLowerCase();
+
+    if (!q) {
+      statsEl.classList.add("hidden");
+      resultsEl.innerHTML = "";
+      emptyEl.classList.add("hidden");
+      return;
+    }
+
+    const results = allPosts.filter((post) => {
+      return (
+        post.title.toLowerCase().includes(q) ||
+        post.description.toLowerCase().includes(q) ||
+        post.labels.some((l) => l.toLowerCase().includes(q))
+      );
+    });
+
+    // Update URL without reload
+    const url = new URL(window.location.href);
+    url.searchParams.set("q", query.trim());
+    history.replaceState(null, "", url.toString());
+
+    statsEl.classList.remove("hidden");
+    statsEl.textContent = `${results.length} result${results.length !== 1 ? "s" : ""} for "${query.trim()}"`;
+
+    if (results.length === 0) {
+      resultsEl.innerHTML = "";
+      emptyEl.classList.remove("hidden");
+      return;
+    }
+
+    emptyEl.classList.add("hidden");
+    resultsEl.innerHTML = results
+      .map(
+        (post) => `
+      <a href="/post/${post.slug}" class="block p-5 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:border-neutral-400 dark:hover:border-neutral-500 transition-colors duration-150 group">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex-1 min-w-0">
+            <h2 class="text-base font-semibold text-neutral-900 dark:text-white group-hover:text-neutral-600 dark:group-hover:text-neutral-300 mb-1 truncate">
+              ${highlight(post.title, query.trim())}
+            </h2>
+            ${post.description ? `<p class="text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2">${highlight(post.description, query.trim())}</p>` : ""}
+            ${
+              post.labels.length > 0
+                ? `<div class="flex flex-wrap gap-1.5 mt-2">
+                ${post.labels
+                  .map(
+                    (l) =>
+                      `<span class="text-xs px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300">${highlight(l, query.trim())}</span>`,
+                  )
+                  .join("")}
+              </div>`
+                : ""
+            }
+          </div>
+          <span class="text-xs text-neutral-400 dark:text-neutral-500 whitespace-nowrap mt-0.5">${post.dateFormatted}</span>
+        </div>
+      </a>
+    `,
+      )
+      .join("");
+  }
+
+  document.getElementById("searchInput")!.addEventListener("input", (e) => {
+    search((e.target as HTMLInputElement).value);
+  });
+
+  loadSearchIndex();
+</script>
